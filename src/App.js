@@ -125,7 +125,7 @@ function OwnersComponent() {
   const [owners, setOwners] = useState([])
   
   useEffect(() => {
-    fetch(URL + "api/owner/sho")
+    fetch(URL + "/api/owner/show")
   .then((res) => res.json())
   .then((data) => {
     console.log(data);
@@ -136,7 +136,7 @@ function OwnersComponent() {
 
   return (
     <>
-    {owners.size > 0 ? (
+    {owners.length > 0 ? (
     <>
     <div>
         <Table striped bordered hover>
