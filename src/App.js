@@ -2,12 +2,14 @@ import './App.css';
 import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./style2.css"
+import Table from 'react-bootstrap/Table'
+
 
 import LoggedIn from './LoggedIn';
 import LogIn from './Login';
 import facade from './ApiFacade';
 
-import { useState } from 'react';
+import { useState, state, useEffect } from 'react';
 
 import {
   BrowserRouter as Router,
@@ -15,7 +17,7 @@ import {
   Route,
   NavLink
 } from "react-router-dom";
-import { URL, WEATHER_URL } from './settings';
+import { URL } from './settings';
 
 function LoginPrompt() {
   const [loggedIn, setLoggedIn] = useState(false)
@@ -28,11 +30,6 @@ function LoginPrompt() {
     facade.login(user, pass)
     .then(res => res.json())
     .then(res => setLoggedIn(true));
-  }
-
-  const weatherData =(city) => {
-    facade.weatherData(city)
-    
   }
 
   return (
@@ -105,72 +102,12 @@ function Header(){
 
 
 function Home() {
-  const [city, setCity] = useState('')
-  const [weatherData, setWeatherData] = useState(null)
-
-  const fetchWeather = async (event) => {
-    event.preventDefault()
-
-    const response = await fetch(`${WEATHER_URL}?city=${city}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-
-    const data = await response.json()
-    setWeatherData(data)
-  }
-
-  if (weatherData !== null) {
-    return (
-      <div>
-        <div>City: { weatherData.weather.city }</div>
-        <div>Official Name: { weatherData.country.officialName }</div>
-        <div>Population: { weatherData.country.population }</div>
-        <div>Temperature: { weatherData.weather.temperature }</div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="col-md-12 text-center">
-      <h2>Weather Information Central Service System (WICSS)</h2>
-      <form action={WEATHER_URL} method="POST">
-        <input type="text" name="city" value={city} onChange={e => setCity(e.target.value)} />
-        <button onClick={fetchWeather}>Submit</button>
-      </form>
-    </div>
-  );
-}
-
-/*function Home() {
-  const myForm = document.getElementById('myForm');
-  myForm.addEventListener('submit', function (e){
-    e.preventDefault();
-    const formData = new FormData(this);
-    <form class="form" id="myForm">
-        <input type="text" name="city"/>
-        <button onClick="submit">Submit</button>
-      </form>
-    fetch('http://localhost:8080/CA2/api/weather',{
-      method: 'POST',
-      body: 'formData'
-    }).then(function(response){
-      return response.text();
-    }).then(function (text) {
-      console.log(text);
-    }).catch(function (error) {
-      console.log(error)
-    })
-  })
-  return (
-    <div className="col-md-12 text-center">
-      <h2>Weather Information Central Service System (WICSS)</h2>
+  return(
+    <div>
       
     </div>
   );
-}*/
+}
 
 function Login() {
   return (
@@ -182,11 +119,66 @@ function Login() {
   );
 }
 
+
+
+function OwnersComponent() {
+  const [owners, setOwners] = useState([])
+  
+  useEffect(() => {
+    fetch(URL + "api/owner/sho")
+  .then((res) => res.json())
+  .then((data) => {
+    console.log(data);
+    setOwners(data);
+  });
+  }, []);
+  
+
+  return (
+    <>
+    {owners.size > 0 ? (
+    <>
+    <div>
+        <Table striped bordered hover>
+          <thead>
+          <tr>
+          <td>ID</td>
+          <td>Name</td>
+          <td>Address</td>
+          <td>Phone</td>
+          </tr>
+            </thead>
+            <tbody>
+      {owners.map((x) => {
+        return (
+        <tr key={x.id}>
+        <td>{x.id}</td>
+        <td>{x.name}</td>
+        <td>{x.address}</td>
+        <td>{x.phone}</td>
+        </tr>
+        )
+      })}
+      </tbody>
+      </Table>
+      </div>
+    </>
+    )
+     :
+    (
+    <h2>Failed fetching data</h2>
+    )}
+    </>
+    );
+ 
+}
+
+
 function Dashboard() {
   return (
-    <div>
-      <h2>Dashboard</h2>
-    </div>
+    OwnersComponent()
   );
+
+    
 }
 
